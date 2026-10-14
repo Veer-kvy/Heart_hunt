@@ -459,6 +459,7 @@
     $('rBombs').textContent = r.bombs;
     $('rDiff').textContent = r.diff;
     $('pbNote').textContent = run.isPB ? 'NEW PERSONAL BEST!' : '';
+    var showRank = onlineOn(); $('rRank').hidden = !showRank; $('rRank').previousElementSibling.hidden = !showRank;
     showSection('infOver'); paintSubmit();
     if (run.isPB) { sfx('pb'); burst(el.fx2, 30, ['#ffd23f', '#ff3d7f', '#2ee6c5', '#fff1d6']); }
     else sfx('over');
@@ -468,8 +469,8 @@
     if (!run || !run.result) return;
     var rank = $('rRank'), msg = $('submitMsg'), retry = $('iRetry');
     retry.hidden = true; retry.disabled = false; msg.className = 'small status';
+    if (!onlineOn()) { msg.textContent = ''; return; }
     if (run.result.score <= 0) { rank.textContent = '-'; msg.textContent = 'SCORE 0 IS NOT SUBMITTED.'; return; }
-    if (!onlineOn()) { rank.textContent = 'NOT SET UP'; msg.textContent = 'SAVED ON THIS DEVICE. ONLINE LEADERBOARD IS NOT SET UP.'; return; }
     if (run.status === 'pending') { rank.textContent = 'SUBMITTING...'; msg.textContent = ''; }
     else if (run.status === 'ok') { rank.textContent = run.rank ? '#' + run.rank : '-'; msg.textContent = 'SCORE SUBMITTED ONLINE.'; }
     else if (run.status === 'failed') {
@@ -547,9 +548,12 @@
   }
   function openLeaderboard(tab) {
     stopAll(); if (isPlaying() || state === 'PAUSED') state = 'MENU';
-    showSection('lb'); setTab(tab || lbTab);
+    showSection('lb');
+    $('tabGlobal').hidden = !onlineOn();                     /* no online board configured: no GLOBAL tab, no message */
+    setTab(tab || lbTab);
   }
   function setTab(t) {
+    if (t === 'global' && !onlineOn()) t = 'infinity';
     lbTab = t;
     document.querySelectorAll('.tab').forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-tab') === t ? 'true' : 'false'); });
     renderLb();
