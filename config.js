@@ -7,6 +7,6 @@
               Row Level Security and the functions in supabase/schema.sql.
    NEVER put the service_role / secret key here. See README.md for setup. */
 window.HEART_HUNT_SUPABASE = {
-  url: '',
+  url: 'https://xmbgcttrzwwmyvjcaarr.supabase.co',
   anonKey: 'sb_publishable_5WB0xYrUXmeGu44lAUucbQ_n3r4Y-VW'
 };
