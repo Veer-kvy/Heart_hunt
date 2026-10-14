@@ -18,7 +18,7 @@ button,input{font-family:inherit}
 button:focus-visible,input:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
 [hidden]{display:none!important}
 .game{position:relative;width:100%;max-width:480px;min-height:100%;background:var(--bg);padding:20px;display:flex;flex-direction:column;gap:12px;overflow-x:hidden}
-.game::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0,rgba(0,0,0,.12) 2px,transparent 2px,transparent 4px);z-index:20}
+.game::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.07) 0,rgba(0,0,0,.07) 2px,transparent 2px,transparent 4px);z-index:20}
 h1{margin:0;text-align:center;font-size:clamp(22px,7vw,30px);line-height:1.3;color:var(--pink);text-shadow:4px 4px 0 var(--shadow)}
 h2{margin:0;text-align:center;font-size:clamp(13px,4.4vw,17px);line-height:1.5;color:var(--gold)}
 h3{margin:4px 0;font-size:10px;color:var(--muted)}
@@ -26,12 +26,14 @@ h3{margin:4px 0;font-size:10px;color:var(--muted)}
 .stats{display:flex;gap:8px}
 .stat{flex:1;background:var(--panel);border:4px solid var(--edge);padding:9px;display:flex;flex-direction:column;gap:7px;min-width:0}
 .stat span:first-child{font-size:9px;color:var(--muted)}
-.stat span:last-child{font-size:clamp(13px,5vw,19px)}
+.stat span:last-child{font-size:clamp(12px,4.6vw,19px);overflow-wrap:anywhere;line-height:1.2}
+.stat span:first-child{overflow-wrap:anywhere}
 .bar{height:16px;background:var(--panel);border:4px solid var(--edge)}
 .bar div{height:100%;width:100%;transition:width .12s linear}
-.goalrow{display:flex;justify-content:space-between;align-items:center;font-size:10px;gap:8px}
-.goalrow .bar{flex:1}
-.strikes{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--panel);border:4px solid var(--edge);padding:8px 10px;font-size:10px}
+.goalrow{display:flex;justify-content:space-between;align-items:center;font-size:10px;gap:8px;flex-wrap:wrap}
+.goalrow>span{white-space:nowrap}
+.goalrow .bar{flex:1;min-width:48px}
+.strikes{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;background:var(--panel);border:4px solid var(--edge);padding:8px 10px;font-size:10px}
 .strikes b{font-size:13px}
 .strikes .pips{display:flex;gap:6px}
 .strikes .pips svg{width:22px;height:22px;opacity:.28}
@@ -50,14 +52,16 @@ h3{margin:4px 0;font-size:10px;color:var(--muted)}
 .cell.fade svg{opacity:.55}
 .cell.bomb,.grid.shielded .cell.bomb{border-color:var(--red)}
 .cell .pop{font-size:clamp(10px,3.6vw,15px)}
-.toast{position:absolute;left:50%;top:6px;transform:translateX(-50%);z-index:5;max-width:96%;text-align:center;font-size:clamp(9px,3.2vw,12px);line-height:1.5;padding:8px 10px;background:var(--bg);border:4px solid var(--gold);color:var(--gold);pointer-events:none}
+.toastslot{min-height:44px;display:flex;align-items:stretch}
+.toast{width:100%;text-align:center;font-size:clamp(9px,3.2vw,12px);line-height:1.5;padding:8px 10px;background:var(--bg);border:4px solid var(--gold);color:var(--gold);display:flex;align-items:center;justify-content:center;overflow-wrap:anywhere}
 .toast.red{border-color:var(--red);color:var(--red)}
 .toast.teal{border-color:var(--teal);color:var(--teal)}
 .toast.pink{border-color:var(--pink);color:var(--pink)}
 .toast.show{animation:pop .25s steps(3)}
 .fx{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:6}
 .px{position:absolute;left:50%;top:50%;width:8px;height:8px;animation:fly .7s steps(7) forwards}
-.overlay{position:absolute;inset:0;background:rgba(27,16,53,.96);border:4px solid var(--edge);display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:12px;text-align:center;z-index:7;overflow:auto;padding:14px}
+.overlay{position:static;background:var(--panel);border:4px solid var(--edge);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:16px 14px}
+.board.screen .grid{display:none}
 .overlay p,.panel p{margin:0;font-size:10px;line-height:1.9}
 .small{font-size:9px;color:var(--muted)}
 .row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
@@ -71,12 +75,12 @@ h3{margin:4px 0;font-size:10px;color:var(--muted)}
 .cta:disabled{opacity:.5;cursor:wait}
 .nick{display:flex;flex-direction:column;gap:6px;font-size:9px;color:var(--muted);width:100%}
 .nick input{width:100%;min-height:44px;padding:10px;font-size:12px;color:var(--cream);background:var(--panel);border:4px solid var(--edge);border-radius:0;text-transform:none}
-.lvgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;width:100%}
+.lvgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:8px;width:100%}
 .lv{min-height:58px;padding:6px 2px;background:var(--panel);border:4px solid var(--edge);border-radius:0;color:var(--cream);font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
 .lv.cur{border-color:var(--gold)}
 .lv:disabled{opacity:.45;cursor:not-allowed}
-.stars{display:flex;gap:4px;justify-content:center}
-.stars svg{width:14px;height:14px}
+.stars{display:flex;gap:3px;justify-content:center}
+.stars svg{width:12px;height:12px}
 .stars.big svg{width:28px;height:28px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:space-between;font-size:9px}
 .legend div{display:flex;align-items:center;gap:6px}
@@ -106,14 +110,14 @@ tr.mine td:nth-child(2)::after{content:" < YOU";color:var(--teal);font-size:7px}
 .status{min-height:16px;font-size:10px;line-height:1.7;text-align:center}
 .status.err{color:var(--red)}
 .status.warn{color:var(--gold)}
-.warn{position:absolute;inset:0;pointer-events:none;z-index:15}
-.warn.on{animation:warn .5s steps(4)}
-.warn.on.strong{animation:warn2 .7s steps(6)}
+.strikeflash{position:absolute;inset:0;pointer-events:none;z-index:15}
+.strikeflash.on{animation:warn .5s steps(4)}
+.strikeflash.on.strong{animation:warn2 .7s steps(6)}
 .flash{animation:flash .5s steps(4)}
 .shake{animation:shake .35s steps(7)}
 .shake2{animation:shake2 .5s steps(10)}
 .pulse{animation:pulse .6s steps(4)}
-@keyframes pop{0%{transform:translateX(-50%) scale(.7)}100%{transform:translateX(-50%) scale(1)}}
+@keyframes pop{0%{transform:scale(.9)}100%{transform:scale(1)}}
 @keyframes fly{0%{transform:translate(0,0)}100%{transform:translate(var(--dx),var(--dy));opacity:0}}
 @keyframes warn{0%,50%{box-shadow:inset 0 0 0 100vmax rgba(255,75,75,.28)}25%,75%,100%{box-shadow:none}}
 @keyframes warn2{0%,40%,80%{box-shadow:inset 0 0 0 100vmax rgba(255,75,75,.42)}20%,60%,100%{box-shadow:none}}
@@ -130,11 +134,12 @@ tr.mine td:nth-child(2)::after{content:" < YOU";color:var(--teal);font-size:7px}
 </head>
 <body>
 <main class="game" id="game">
-<div class="warn" id="warn" aria-hidden="true"></div>
+<div class="strikeflash" id="warn" aria-hidden="true"></div>
 <h1>HEART HUNT</h1>
 
 <!-- ========== PLAY AREA (menu / classic / infinity share it) ========== -->
 <section class="section" id="play">
+  <div class="section" id="hud">
   <div class="stats">
     <div class="stat"><span>SCORE</span><span id="score" style="color:var(--gold)">0</span></div>
     <div class="stat"><span id="statBLabel">TIME</span><span id="statB" style="color:var(--teal)">30</span></div>
@@ -160,11 +165,12 @@ tr.mine td:nth-child(2)::after{content:" < YOU";color:var(--teal);font-size:7px}
       <span>RANK: <b id="infRank">HEART NOVICE</b></span>
     </div>
     <div class="chips" id="chips"></div>
+    <div class="toastslot"><div class="toast" id="toast" role="status" aria-live="polite" hidden></div></div>
+  </div>
   </div>
 
   <div class="board" id="board">
     <div class="grid" id="grid"></div>
-    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
     <div class="fx" id="fx" aria-hidden="true"></div>
 
     <div class="overlay" id="menu">

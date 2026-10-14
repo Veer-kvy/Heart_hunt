@@ -353,13 +353,18 @@
   /* ================= SCREENS ================= */
   var overlays = { menu: $('menu'), levels: $('levels'), cover: $('cover'), paused: $('paused') };
   var sections = { play: $('play'), infOver: $('infOver'), lb: $('lb') };
-  function showOverlay(name) { for (var k in overlays) overlays[k].hidden = (k !== name); }
+  function showOverlay(name) {
+    for (var k in overlays) overlays[k].hidden = (k !== name);
+    $('board').classList.toggle('screen', !!name);                       /* a screen replaces the board - nothing is covered */
+    var bare = name === 'menu' || name === 'levels';                      /* menu: no score/timer bars behind it */
+    $('hud').hidden = bare; $('legend').hidden = bare;
+  }
   function showSection(name) { for (var k in sections) sections[k].hidden = (k !== name); }
   function focusSoon(node) { setTimeout(function () { try { node.focus(); } catch (e) { /* ignore */ } }, 0); }
 
   function resetFeedback() {
     clearTimeout(overTimer); overTimer = 0; clearToast(); clearFx();
-    el.warn.className = 'warn'; el.game.classList.remove('shake', 'shake2', 'flash');
+    el.warn.className = 'strikeflash'; el.game.classList.remove('shake', 'shake2', 'flash');
   }
   function stopAll() { stopLoop(); stopMusic(); resetFeedback(); }
 
