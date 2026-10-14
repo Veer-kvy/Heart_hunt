@@ -4,155 +4,270 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Heart Hunt</title>
-<meta name="description" content="A retro 8-bit heart collecting game. Tap the hearts before they vanish.">
+<meta name="description" content="A retro 8-bit heart collecting game with 10 levels and an endless three-bomb Infinity mode.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 8' shape-rendering='crispEdges'%3E%3Cpath d='M1 0h2v1h-2z M6 0h2v1h-2z M0 1h4v1h-4z M5 1h4v1h-4z M0 2h9v2h-9z M1 4h7v1h-7z M2 5h5v1h-5z M3 6h3v1h-3z M4 7h1v1h-1z' fill='%23ff3d7f'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#1b1035;--panel:#2a1a52;--edge:#4a2f8a;--cream:#fff1d6;--pink:#ff3d7f;--gold:#ffd23f;--teal:#2ee6c5;--violet:#7a5cc4;--muted:#9d86d6;--shadow:#6b1f5c}
+:root{--bg:#1b1035;--panel:#2a1a52;--edge:#4a2f8a;--cream:#fff1d6;--pink:#ff3d7f;--gold:#ffd23f;--teal:#2ee6c5;--violet:#7a5cc4;--muted:#9d86d6;--shadow:#6b1f5c;--red:#ff4b4b}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;background:#0f0820}
 body{display:flex;justify-content:center;align-items:flex-start;font-family:'Press Start 2P','Courier New',monospace;color:var(--cream);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-button{font-family:inherit}
-button:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
-.game{position:relative;width:100%;max-width:480px;min-height:100%;background:var(--bg);padding:24px;display:flex;flex-direction:column;gap:16px}
-.game::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0,rgba(0,0,0,.12) 2px,transparent 2px,transparent 4px)}
+button,input{font-family:inherit}
+button:focus-visible,input:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
+[hidden]{display:none!important}
+.game{position:relative;width:100%;max-width:480px;min-height:100%;background:var(--bg);padding:20px;display:flex;flex-direction:column;gap:12px;overflow-x:hidden}
+.game::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0,rgba(0,0,0,.12) 2px,transparent 2px,transparent 4px);z-index:20}
 h1{margin:0;text-align:center;font-size:clamp(22px,7vw,30px);line-height:1.3;color:var(--pink);text-shadow:4px 4px 0 var(--shadow)}
+h2{margin:0;text-align:center;font-size:clamp(13px,4.4vw,17px);line-height:1.5;color:var(--gold)}
+h3{margin:4px 0;font-size:10px;color:var(--muted)}
+.section{display:flex;flex-direction:column;gap:12px}
 .stats{display:flex;gap:8px}
-.stat{flex:1;background:var(--panel);border:4px solid var(--edge);padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.stat{flex:1;background:var(--panel);border:4px solid var(--edge);padding:9px;display:flex;flex-direction:column;gap:7px;min-width:0}
 .stat span:first-child{font-size:9px;color:var(--muted)}
-.stat span:last-child{font-size:clamp(14px,5vw,20px)}
+.stat span:last-child{font-size:clamp(13px,5vw,19px)}
 .bar{height:16px;background:var(--panel);border:4px solid var(--edge)}
-.bar div{height:100%;background:var(--teal);width:100%;transition:width .12s linear}
+.bar div{height:100%;width:100%;transition:width .12s linear}
+.goalrow{display:flex;justify-content:space-between;align-items:center;font-size:10px;gap:8px}
+.goalrow .bar{flex:1}
+.strikes{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--panel);border:4px solid var(--edge);padding:8px 10px;font-size:10px}
+.strikes b{font-size:13px}
+.strikes .pips{display:flex;gap:6px}
+.strikes .pips svg{width:22px;height:22px;opacity:.28}
+.strikes .pips svg.on{opacity:1}
+.strikes.hot{border-color:var(--red);color:var(--red)}
+.infinfo{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:9px;line-height:1.6}
+.infinfo b{color:var(--gold);font-weight:normal}
+.chips{display:flex;flex-wrap:wrap;gap:6px;min-height:22px;width:100%}
+.chip{font-size:8px;padding:5px 7px;border:3px solid var(--teal);color:var(--teal);background:var(--panel)}
+.chip.shield{border-color:var(--cream);color:var(--cream)}
 .board{position:relative}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.cell{aspect-ratio:1/1;min-height:64px;padding:0;background:var(--panel);border:4px solid var(--edge);border-radius:0;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:0}
+.grid.shielded .cell{border-color:var(--teal)}
+.cell{aspect-ratio:1/1;min-height:60px;padding:0;background:var(--panel);border:4px solid var(--edge);border-radius:0;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation;color:var(--cream)}
 .cell svg{width:62%;height:auto}
-.cell .pop{font-size:clamp(11px,4vw,16px)}
-.overlay{position:absolute;inset:0;background:rgba(27,16,53,.95);border:4px solid var(--edge);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;z-index:2}
-.overlay[hidden]{display:none}
-.overlay p{margin:0;font-size:11px;line-height:1.9}
-.cta{min-height:52px;padding:14px 22px;font-size:14px;color:var(--bg);background:var(--gold);border:4px solid var(--cream);border-radius:0;box-shadow:4px 4px 0 var(--shadow);cursor:pointer}
+.cell.fade svg{opacity:.55}
+.cell.bomb,.grid.shielded .cell.bomb{border-color:var(--red)}
+.cell .pop{font-size:clamp(10px,3.6vw,15px)}
+.toast{position:absolute;left:50%;top:6px;transform:translateX(-50%);z-index:5;max-width:96%;text-align:center;font-size:clamp(9px,3.2vw,12px);line-height:1.5;padding:8px 10px;background:var(--bg);border:4px solid var(--gold);color:var(--gold);pointer-events:none}
+.toast.red{border-color:var(--red);color:var(--red)}
+.toast.teal{border-color:var(--teal);color:var(--teal)}
+.toast.pink{border-color:var(--pink);color:var(--pink)}
+.toast.show{animation:pop .25s steps(3)}
+.fx{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:6}
+.px{position:absolute;left:50%;top:50%;width:8px;height:8px;animation:fly .7s steps(7) forwards}
+.overlay{position:absolute;inset:0;background:rgba(27,16,53,.96);border:4px solid var(--edge);display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:12px;text-align:center;z-index:7;overflow:auto;padding:14px}
+.overlay p,.panel p{margin:0;font-size:10px;line-height:1.9}
+.small{font-size:9px;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.menugrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.menugrid .cta{padding:12px 6px;font-size:11px}
+.cta{min-height:48px;padding:12px 14px;font-size:11px;color:var(--bg);background:var(--gold);border:4px solid var(--cream);border-radius:0;box-shadow:4px 4px 0 var(--shadow);cursor:pointer}
 .cta:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--shadow)}
 .cta.teal{background:var(--teal)}
-.legend{display:flex;justify-content:space-between;font-size:10px}
-.legend div{display:flex;align-items:center;gap:8px}
-.legend svg{width:22px;height:20px}
-@media (prefers-reduced-motion:reduce){.bar div{transition:none}.cta:active{transform:none}}
+.cta.pink{background:var(--pink)}
+.cta.ghost{background:var(--panel);color:var(--cream);border-color:var(--edge)}
+.cta:disabled{opacity:.5;cursor:wait}
+.nick{display:flex;flex-direction:column;gap:6px;font-size:9px;color:var(--muted);width:100%}
+.nick input{width:100%;min-height:44px;padding:10px;font-size:12px;color:var(--cream);background:var(--panel);border:4px solid var(--edge);border-radius:0;text-transform:none}
+.lvgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;width:100%}
+.lv{min-height:58px;padding:6px 2px;background:var(--panel);border:4px solid var(--edge);border-radius:0;color:var(--cream);font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.lv.cur{border-color:var(--gold)}
+.lv:disabled{opacity:.45;cursor:not-allowed}
+.stars{display:flex;gap:4px;justify-content:center}
+.stars svg{width:14px;height:14px}
+.stars.big svg{width:28px;height:28px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:space-between;font-size:9px}
+.legend div{display:flex;align-items:center;gap:6px}
+.legend svg{width:20px;height:18px}
+.mute{align-self:center;min-height:44px;padding:10px 14px;font-size:10px;color:var(--cream);background:var(--panel);border:4px solid var(--edge);border-radius:0;cursor:pointer}
+.mute[aria-pressed=true]{color:var(--muted)}
+.panel{position:relative;background:var(--panel);border:4px solid var(--edge);padding:14px;display:flex;flex-direction:column;gap:12px;align-items:stretch}
+.results{display:grid;grid-template-columns:1fr auto;gap:8px 10px;margin:0;font-size:10px}
+.results dt{color:var(--muted);align-self:center}
+.results dd{margin:0;text-align:right;color:var(--cream)}
+.results dd.big{font-size:20px;color:var(--gold)}
+.pbnote{text-align:center;font-size:12px;color:var(--teal);min-height:16px}
+.tabs{display:flex;gap:6px}
+.tab{flex:1;min-height:44px;padding:8px 4px;font-size:9px;color:var(--cream);background:var(--bg);border:4px solid var(--edge);border-radius:0;cursor:pointer}
+.tab[aria-selected=true]{background:var(--gold);color:var(--bg);border-color:var(--cream)}
+.tablewrap{overflow-x:auto;max-height:46vh;border:4px solid var(--edge);background:var(--bg)}
+table{width:100%;border-collapse:collapse;font-size:9px}
+th{position:sticky;top:0;background:var(--edge);color:var(--cream);padding:7px 5px;text-align:left;font-weight:normal;line-height:1.4}
+td{padding:7px 5px;border-top:2px solid var(--panel);vertical-align:middle;line-height:1.5}
+td.num,th.num{text-align:right}
+td small{display:block;font-size:7px;color:var(--muted)}
+tr.r1 td{color:var(--gold);background:rgba(255,210,63,.1)}
+tr.r2 td{color:#e6e2f7}
+tr.r3 td{color:#f0b07a}
+tr.mine td{background:rgba(46,230,197,.16)}
+tr.mine td:nth-child(2)::after{content:" < YOU";color:var(--teal);font-size:7px}
+.status{min-height:16px;font-size:10px;line-height:1.7;text-align:center}
+.status.err{color:var(--red)}
+.status.warn{color:var(--gold)}
+.warn{position:absolute;inset:0;pointer-events:none;z-index:15}
+.warn.on{animation:warn .5s steps(4)}
+.warn.on.strong{animation:warn2 .7s steps(6)}
+.flash{animation:flash .5s steps(4)}
+.shake{animation:shake .35s steps(7)}
+.shake2{animation:shake2 .5s steps(10)}
+.pulse{animation:pulse .6s steps(4)}
+@keyframes pop{0%{transform:translateX(-50%) scale(.7)}100%{transform:translateX(-50%) scale(1)}}
+@keyframes fly{0%{transform:translate(0,0)}100%{transform:translate(var(--dx),var(--dy));opacity:0}}
+@keyframes warn{0%,50%{box-shadow:inset 0 0 0 100vmax rgba(255,75,75,.28)}25%,75%,100%{box-shadow:none}}
+@keyframes warn2{0%,40%,80%{box-shadow:inset 0 0 0 100vmax rgba(255,75,75,.42)}20%,60%,100%{box-shadow:none}}
+@keyframes flash{0%,50%{box-shadow:inset 0 0 0 100vmax rgba(46,230,197,.25)}25%,75%{box-shadow:none}}
+@keyframes shake{0%{transform:translate(0)}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(4px,2px)}100%{transform:translate(0)}}
+@keyframes shake2{0%{transform:translate(0)}15%{transform:translate(-9px,4px)}30%{transform:translate(9px,-4px)}45%{transform:translate(-8px,-4px)}60%{transform:translate(8px,4px)}75%{transform:translate(-5px,2px)}100%{transform:translate(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .cta:active{transform:none}
+}
+@media (max-width:360px){.game{padding:12px}.cell{min-height:54px}}
 </style>
 </head>
 <body>
-<main class="game">
+<main class="game" id="game">
+<div class="warn" id="warn" aria-hidden="true"></div>
 <h1>HEART HUNT</h1>
-<div class="stats">
-<div class="stat"><span>SCORE</span><span id="score" style="color:var(--gold)">0</span></div>
-<div class="stat"><span>TIME</span><span id="time" style="color:var(--teal)">30</span></div>
-<div class="stat"><span>BEST</span><span id="best">0</span></div>
-</div>
-<div class="bar" aria-hidden="true"><div id="bar"></div></div>
-<div class="board">
-<div class="grid" id="grid"></div>
-<div class="overlay" id="title">
-<svg viewBox="0 0 9 8" width="90" height="80" shape-rendering="crispEdges" aria-hidden="true"><path d="M1 0h2v1h-2z M6 0h2v1h-2z M0 1h4v1h-4z M5 1h4v1h-4z M0 2h9v2h-9z M1 4h7v1h-7z M2 5h5v1h-5z M3 6h3v1h-3z M4 7h1v1h-1z" fill="#ff3d7f"/><rect x="1" y="1" width="1" height="1" fill="#fff1d6"/><rect x="2" y="2" width="1" height="1" fill="#fff1d6"/></svg>
-<p>TAP HEARTS<br>BEFORE THEY VANISH</p>
-<button class="cta" id="start" type="button">PRESS START</button>
-</div>
-<div class="overlay" id="over" hidden>
-<span style="font-size:18px;color:var(--pink)">GAME OVER</span>
-<span style="font-size:11px;color:var(--muted)">FINAL SCORE</span>
-<span id="final" style="font-size:32px;color:var(--gold)">0</span>
-<button class="cta teal" id="again" type="button">PLAY AGAIN</button>
-</div>
-</div>
-<div class="legend" aria-label="Scoring">
-<div><svg viewBox="0 0 9 8" shape-rendering="crispEdges" aria-hidden="true"><use href="#h" fill="#ff3d7f"/></svg>+1</div>
-<div><svg viewBox="0 0 9 8" shape-rendering="crispEdges" aria-hidden="true"><use href="#h" fill="#ffd23f"/></svg>+5</div>
-<div><svg viewBox="0 0 9 8" shape-rendering="crispEdges" aria-hidden="true"><use href="#h" fill="#7a5cc4"/><path d="M4 0h1v2h-1z M5 2h1v2h-1z M3 4h1v2h-1z" fill="#1b1035"/></svg>-3</div>
-</div>
+
+<!-- ========== PLAY AREA (menu / classic / infinity share it) ========== -->
+<section class="section" id="play">
+  <div class="stats">
+    <div class="stat"><span>SCORE</span><span id="score" style="color:var(--gold)">0</span></div>
+    <div class="stat"><span id="statBLabel">TIME</span><span id="statB" style="color:var(--teal)">30</span></div>
+    <div class="stat"><span>BEST</span><span id="best">0</span></div>
+  </div>
+
+  <div id="classicInfo" class="section" style="gap:10px">
+    <div class="bar" aria-hidden="true"><div id="bar" style="background:var(--teal)"></div></div>
+    <div class="goalrow">
+      <span id="lvlabel" style="color:var(--gold)">LEVEL 1</span>
+      <div class="bar" aria-hidden="true"><div id="goalbar" style="background:var(--gold);width:0"></div></div>
+      <span id="goaltxt" role="status">GOAL 12</span>
+    </div>
+  </div>
+
+  <div id="infinityInfo" class="section" style="gap:8px" hidden>
+    <div class="strikes" id="strikesBox">
+      <span id="strikeLabel" aria-live="polite">BOMB STRIKES: <b id="strikeVal">0/3</b></span>
+      <span class="pips" id="pips" aria-hidden="true"></span>
+    </div>
+    <div class="infinfo">
+      <span>DIFFICULTY: <b id="infDiff">EASY</b></span>
+      <span>RANK: <b id="infRank">HEART NOVICE</b></span>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="board" id="board">
+    <div class="grid" id="grid"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <div class="fx" id="fx" aria-hidden="true"></div>
+
+    <div class="overlay" id="menu">
+      <svg viewBox="0 0 9 8" width="56" height="50" shape-rendering="crispEdges" aria-hidden="true"><path d="M1 0h2v1h-2z M6 0h2v1h-2z M0 1h4v1h-4z M5 1h4v1h-4z M0 2h9v2h-9z M1 4h7v1h-7z M2 5h5v1h-5z M3 6h3v1h-3z M4 7h1v1h-1z" fill="#ff3d7f"/><rect x="1" y="1" width="1" height="1" fill="#fff1d6"/><rect x="2" y="2" width="1" height="1" fill="#fff1d6"/></svg>
+      <p>TAP HEARTS BEFORE THEY VANISH</p>
+      <div class="menugrid">
+        <button class="cta" id="mClassic" type="button">CLASSIC</button>
+        <button class="cta pink" id="mInfinity" type="button">INFINITY</button>
+        <button class="cta ghost" id="mLevels" type="button">LEVELS</button>
+        <button class="cta ghost" id="mBoard" type="button">SCORES</button>
+      </div>
+      <p class="small" id="menuHint">INFINITY: NO TIMER. THREE BOMB STRIKES AND IT IS OVER.</p>
+      <label class="nick">NICKNAME (A-Z 0-9, MAX 12)
+        <input id="nick" type="text" maxlength="12" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="PLAYER">
+      </label>
+      <p class="small" id="menuBest"></p>
+    </div>
+
+    <div class="overlay" id="levels" hidden>
+      <span style="font-size:14px;color:var(--gold)">SELECT LEVEL</span>
+      <div class="lvgrid" id="lvgrid"></div>
+      <button class="cta ghost" id="backFromLevels" type="button">BACK</button>
+    </div>
+
+    <div class="overlay" id="cover" hidden>
+      <span id="overTitle" style="font-size:16px;color:var(--pink)">TIME UP</span>
+      <span id="overLevel" style="font-size:10px;color:var(--muted)">LEVEL 1</span>
+      <span id="final" style="font-size:28px;color:var(--gold)">0</span>
+      <span id="overGoal" style="font-size:10px;line-height:1.8">GOAL 12</span>
+      <div class="stars big" id="overStars" aria-hidden="true"></div>
+      <span id="overNote" style="font-size:10px;line-height:1.8;color:var(--teal)" role="status"></span>
+      <div class="row">
+        <button class="cta teal" id="next" type="button" hidden>NEXT LEVEL</button>
+        <button class="cta" id="again" type="button">RETRY</button>
+        <button class="cta ghost" id="toLevels" type="button">LEVELS</button>
+        <button class="cta ghost" id="cMenu" type="button">MENU</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="paused" hidden>
+      <span style="font-size:16px;color:var(--gold)">PAUSED</span>
+      <button class="cta" id="resume" type="button">RESUME</button>
+      <button class="cta ghost" id="pMenu" type="button">QUIT TO MENU</button>
+    </div>
+  </div>
+
+  <div class="legend" id="legend" aria-label="Scoring"></div>
+</section>
+
+<!-- ========== INFINITY GAME OVER ========== -->
+<section class="panel" id="infOver" hidden aria-labelledby="infOverTitle">
+  <div class="fx" id="fx2" aria-hidden="true"></div>
+  <h2 id="infOverTitle">INFINITY RUN OVER</h2>
+  <div class="pbnote" id="pbNote" role="status"></div>
+  <dl class="results">
+    <dt>FINAL SCORE</dt><dd class="big" id="rScore">0</dd>
+    <dt>PERSONAL BEST</dt><dd id="rBest">0</dd>
+    <dt>GLOBAL RANK</dt><dd id="rRank">-</dd>
+    <dt>HIGHEST COMBO</dt><dd id="rCombo">0</dd>
+    <dt>TOTAL HEARTS COLLECTED</dt><dd id="rHearts">0</dd>
+    <dt>GOLDEN HEARTS COLLECTED</dt><dd id="rGolds">0</dd>
+    <dt>BOMBS TRIGGERED</dt><dd id="rBombs">0</dd>
+    <dt>HIGHEST DIFFICULTY</dt><dd id="rDiff">EASY</dd>
+  </dl>
+  <p class="small status" id="submitMsg" role="status"></p>
+  <div class="row">
+    <button class="cta pink" id="iAgain" type="button">PLAY AGAIN</button>
+    <button class="cta" id="iBoard" type="button">LEADERBOARD</button>
+    <button class="cta ghost" id="iMenu" type="button">MAIN MENU</button>
+    <button class="cta teal" id="iRetry" type="button" hidden>RETRY SUBMIT</button>
+  </div>
+</section>
+
+<!-- ========== LEADERBOARD ========== -->
+<section class="panel" id="lb" hidden aria-labelledby="lbTitle">
+  <h2 id="lbTitle">LEADERBOARD</h2>
+  <div class="tabs" role="tablist" aria-label="Leaderboard">
+    <button class="tab" role="tab" id="tabGlobal" data-tab="global" aria-selected="true" type="button">GLOBAL</button>
+    <button class="tab" role="tab" id="tabInfinity" data-tab="infinity" aria-selected="false" type="button">INFINITY</button>
+    <button class="tab" role="tab" id="tabClassic" data-tab="classic" aria-selected="false" type="button">CLASSIC</button>
+  </div>
+  <p class="small" id="lbScope"></p>
+  <p class="small" id="lbMine"></p>
+  <p class="status" id="lbStatus" role="status"></p>
+  <div class="tablewrap" id="lbWrap"><table aria-label="Scores"><thead id="lbHead"></thead><tbody id="lbBody"></tbody></table></div>
+  <div id="recentWrap" hidden>
+    <h3>RECENT ONLINE SCORES</h3>
+    <div class="tablewrap"><table aria-label="Recent scores"><thead><tr><th>PLAYER</th><th class="num">SCORE</th><th class="num">COMBO</th></tr></thead><tbody id="recentBody"></tbody></table></div>
+  </div>
+  <div class="row">
+    <button class="cta teal" id="lbRefresh" type="button">REFRESH</button>
+    <button class="cta ghost" id="lbBack" type="button">BACK</button>
+  </div>
+</section>
+
+<button class="mute" id="mute" type="button" aria-pressed="false">MUSIC: ON</button>
 </main>
+
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><path id="h" d="M1 0h2v1h-2z M6 0h2v1h-2z M0 1h4v1h-4z M5 1h4v1h-4z M0 2h9v2h-9z M1 4h7v1h-7z M2 5h5v1h-5z M3 6h3v1h-3z M4 7h1v1h-1z"/></defs></svg>
-<script>
-(function(){
-  var SECONDS=30, TICK=125;
-  var $=function(id){return document.getElementById(id)};
-  var grid=$('grid'), scoreEl=$('score'), timeEl=$('time'), bestEl=$('best'), bar=$('bar');
-  var titleEl=$('title'), overEl=$('over'), finalEl=$('final');
-  var cells=[], buttons=[], phase='title', score=0, time=SECONDS, ticks=0, best=0, timer=null;
-  try{best=parseInt(localStorage.getItem('heartHuntBest'),10)||0}catch(e){}
-  bestEl.textContent=best;
 
-  var COLORS={pink:'#ff3d7f',gold:'#ffd23f',broken:'#7a5cc4'};
-  var LABELS={pink:'Heart, plus 1',gold:'Golden heart, plus 5',broken:'Broken heart, minus 3'};
-
-  for(var i=0;i<16;i++){
-    (function(i){
-      var b=document.createElement('button');
-      b.type='button'; b.className='cell'; b.setAttribute('aria-label','Empty slot');
-      b.addEventListener('pointerdown',function(e){e.preventDefault();hit(i)});
-      b.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();hit(i)}});
-      grid.appendChild(b); buttons.push(b); cells.push(null);
-    })(i);
-  }
-
-  function heartSvg(type){
-    var c=COLORS[type];
-    return '<svg viewBox="0 0 9 8" shape-rendering="crispEdges" aria-hidden="true"><use href="#h" fill="'+c+'"/>'+
-      '<rect x="1" y="1" width="1" height="1" fill="#fff1d6"/><rect x="2" y="2" width="1" height="1" fill="#fff1d6"/>'+
-      (type==='broken'?'<path d="M4 0h1v2h-1z M5 2h1v2h-1z M3 4h1v2h-1z" fill="#1b1035"/>':'')+'</svg>';
-  }
-  function draw(i){
-    var c=cells[i], b=buttons[i];
-    if(!c){b.innerHTML='';b.setAttribute('aria-label','Empty slot')}
-    else if(c.type==='pop'){b.innerHTML='<span class="pop" style="color:'+(c.good?'#2ee6c5':'#ff3d7f')+'">'+c.label+'</span>';b.setAttribute('aria-label','Collected')}
-    else{b.innerHTML=heartSvg(c.type);b.setAttribute('aria-label',LABELS[c.type])}
-  }
-  function render(){
-    for(var i=0;i<16;i++)draw(i);
-    scoreEl.textContent=score; timeEl.textContent=time; bestEl.textContent=best;
-    bar.style.width=Math.max(0,time/SECONDS*100)+'%';
-  }
-  function start(){
-    clearInterval(timer);
-    phase='play'; score=0; time=SECONDS; ticks=0;
-    cells=cells.map(function(){return null});
-    titleEl.hidden=true; overEl.hidden=true;
-    render(); timer=setInterval(tick,TICK);
-  }
-  function end(){
-    clearInterval(timer); phase='over';
-    cells=cells.map(function(){return null});
-    if(score>best){best=score;try{localStorage.setItem('heartHuntBest',String(best))}catch(e){}}
-    finalEl.textContent=score; overEl.hidden=false; time=0; render();
-    $('again').focus();
-  }
-  function tick(){
-    ticks++;
-    cells=cells.map(function(c){return c?{type:c.type,ttl:c.ttl-1,label:c.label,good:c.good}:null})
-               .map(function(c){return c&&c.ttl>0?c:null});
-    if(Math.random()<0.3){
-      var empty=[];cells.forEach(function(c,i){if(!c)empty.push(i)});
-      if(empty.length){
-        var i=empty[Math.floor(Math.random()*empty.length)], r=Math.random();
-        cells[i]=r<0.1?{type:'gold',ttl:9}:r<0.3?{type:'broken',ttl:14}:{type:'pink',ttl:14};
-      }
-    }
-    if(ticks%8===0)time--;
-    if(time<=0)end();else render();
-  }
-  function hit(i){
-    if(phase!=='play')return;
-    var c=cells[i];
-    if(!c||c.type==='pop')return;
-    var d=c.type==='gold'?5:c.type==='broken'?-3:1;
-    cells[i]={type:'pop',ttl:3,label:(d>0?'+':'')+d,good:d>0};
-    score=Math.max(0,score+d); render();
-  }
-  $('start').addEventListener('click',start);
-  $('again').addEventListener('click',start);
-  $('start').focus();
-  render();
-})();
-</script>
+<script src="config.js"></script>
+<script src="core.js"></script>
+<script src="online.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
