@@ -78,7 +78,10 @@
       if (!configured) return Promise.reject(new Error('NOT CONFIGURED'));
       var sess = ensureSession().then(function (s) { return s.access_token; },
         function (e) { if (needAuth) throw e; return null; });
-      return sess.then(function (token) { return http('/rest/v1/rpc/' + name, { body: args, token: token || key }); });
+      /* New-style publishable keys (sb_publishable_...) are not JWTs: they go in the apikey header only,
+         never as a Bearer token. Legacy anon keys (JWT, start with "eyJ") may also be used as the Bearer fallback. */
+      var legacyJwt = key.indexOf('eyJ') === 0;
+      return sess.then(function (token) { return http('/rest/v1/rpc/' + name, { body: args, token: token || (legacyJwt ? key : null) }); });
     }
 
     function rows(v) { return Array.isArray(v) ? v : []; }

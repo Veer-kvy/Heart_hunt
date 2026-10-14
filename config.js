@@ -8,5 +8,5 @@
    NEVER put the service_role / secret key here. See README.md for setup. */
 window.HEART_HUNT_SUPABASE = {
   url: '',
-  anonKey: ''
+  anonKey: 'sb_publishable_5WB0xYrUXmeGu44lAUucbQ_n3r4Y-VW'
 };
